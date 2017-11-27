@@ -22,6 +22,9 @@ from time import sleep
     
     
 
+def bissexto(ano):
+    if ano % 4 == 0 and ano % 100 != 0 or ano % 400 == 0:
+        return True
 
 def somaDatas():
     '''Função que irá somar a data das incorporações + tempo contrib'''
@@ -46,6 +49,9 @@ def calculaIdade(data):
 def calculaTempo(inicial, final):
     '''Função que calcula o tempo decorrido, dadas data inicial e final.'''
     
+    ano_ini = int(inicial[2])
+    ano_fim = int(final[2])
+    
     inicial = date(int(inicial[2]),int(inicial[1]),int(inicial[0]))
     
     if final == hoje:
@@ -53,41 +59,26 @@ def calculaTempo(inicial, final):
     else:
         final = date(int(final[2]),int(final[1]),int(final[0]))
     
-
-    dic_meses = {1: 31, 2: 28, 3: 31, 4: 30, 5: 31, 6: 30, 7: 31, 8: 31, 9: 30, 10: 31, 11: 30, 12: 31}
-
-
-    anos = final.year - inicial.year
-    meses = 0
-    dias = 0
-
-    if final.month > inicial.month:
-        meses = final.month - inicial.month
-        dias = abs(inicial.day - final.day)
-        if inicial.day > final.day:
-            meses -= 1
-            dias = (dic_meses.get(inicial.month - 1)) - (inicial.day - final.day)
-        
-
-    elif final.month < inicial.month:
-        anos -= 1
-        meses = (final.month + inicial.month) % 12
-        dias = abs(inicial.day - final.day)
-        if inicial.day > final.day:
-            meses -= 1
-            dias = (dic_meses.get(inicial.month - 1)) - (inicial.day - final.day)
-
-
-    else:
-        dias = abs(inicial.day - final.day)
-        
-    return anos,meses,dias  # retorna uma tupla
+    
+    total_dias = abs((final - inicial).days)
+    
+    for anos in range(ano_ini,ano_fim+1):
+        if bissexto(anos):
+            total_dias += 1
+    
+    return total_dias
 
     
     
-def tempoServico():
-    '''Função usada para gerar uma data válida de tempo de serviço trabalhado'''
-    pass
+def tempoServico(qt_dias):
+    '''Função usada para gerar uma data válida de tempo de serviço trabalhado em anos, meses e dias.'''
+    
+    anos = qt_dias // 365
+    meses = (qt_dias % 365) // 30
+    dias = (qt_dias % 365) % 30
+    
+    return anos,meses,dias
+    
 
     
 
@@ -99,8 +90,7 @@ print('-='*20)
 nome = input('Nome do servidor: ').upper()
 sexo = input('Gênero [M/F]: ').strip().lower()
 nasc = input('Data de nascimento [DD/MM/AAAA]: ').strip().split('/')
-adm = input('Data de admissão na SEMED [DD/MM/AAAA]: ').strip().split('/')
-exercicio = input('Servidor em exercício? [S/N]: ').strip().lower()
+
 hoje = date.today()
 
 # Aposentadoria por idade
@@ -117,19 +107,33 @@ elif 70 > anos_idade >= 65 and sexo == 'm':
 elif 70 > anos_idade >= 60 and sexo == 'f':
     print('Servidora com {} anos. Apta para Aposentadoria voluntária proporcional ao tempo de contribuição.'.format(anos_idade))
 else:
-    print('Servidor(a) com {} anos. Não preenche os requisitos para aposentadoria proporcional ao tempo de contribuição.'.format(anos_idade))
+    print('Servidor(a) com {} anos. Não preenche os requisitos para aposentadoria proporcional ao tempo de contribuição.\n'.format(anos_idade))
 
 
 # Aposentadoria voluntária integral
 # 60 idade e 35 contrib H / 55 idade e 30 contrib M
 
-print('\n\nCalculando tempo de serviço...')
-sleep(5)
+exercicio = input('Servidor em exercício? [S/N]: ').strip().lower()
 
 # servidor em exercício sem tempo a incorporar
 # data final == hoje
 
-tempo = calculaTempo(adm,hoje)  # retorna uma tupla
+# -------------------------------------------------------------
+# ADEQUAR O CODIGO ABAIXO À NOVA LÓGICA DE CONTAGEM DE TEMPO
+# -------------------------------------------------------------
+
+if exercicio == 's':
+    adm = input('\nData de admissão na SEMED [DD/MM/AAAA]: ').strip().split('/')
+    print('\n\nCalculando tempo de serviço...')
+    sleep(5)
+    tempo = calculaTempo(adm,hoje) 
+elif exercicio == 'n':
+    inicio = input('\nDigite a data inicial do vínculo [DD/MM/AAAA]: ').strip().split('/')
+    fim = input('Digite a data final do vínculo [DD/MM/AAAA]: ').strip().split('/')
+    print('\n\nCalculando tempo de serviço...\n')
+    sleep(5)
+    tempo = calculaTempo(inicio,fim)
+    
 print('Servidor possui {} anos, {} meses e {} dias de tempo de contribuição'.format(tempo[0],tempo[1],tempo[2]))
 
 if tempo[0] >= 35 and sexo == 'm' and anos_idade >= 60:
@@ -138,7 +142,6 @@ elif tempo[0] >= 30 and sexo == 'f' and anos_idade >= 55:
     print('Servidora apta para Aposentadoria Voluntária Integral.')
 else:
     print('Servidor(a) não preenche os requisitos para Aposentadoria Voluntária Integral.')
-
 
     
 
