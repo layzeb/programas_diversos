@@ -26,9 +26,6 @@ def bissexto(ano):
     if ano % 4 == 0 and ano % 100 != 0 or ano % 400 == 0:
         return True
 
-def somaDatas():
-    '''Função que irá somar a data das incorporações + tempo contrib'''
-    pass
 
 def calculaIdade(data):
     '''Função que recebe uma data de nascimento e informa a idade.'''
@@ -53,11 +50,7 @@ def calculaTempo(inicial, final):
     ano_fim = int(final[2])
     
     inicial = date(int(inicial[2]),int(inicial[1]),int(inicial[0]))
-    
-    if final == hoje:
-        final = date.today()
-    else:
-        final = date(int(final[2]),int(final[1]),int(final[0]))
+    final = date(int(final[2]),int(final[1]),int(final[0]))
     
     
     total_dias = abs((final - inicial).days)
@@ -75,9 +68,11 @@ def tempoServico(qt_dias):
     
     anos = qt_dias // 365
     meses = (qt_dias % 365) // 30
+    if meses == 12:
+        meses -= 1
     dias = (qt_dias % 365) % 30
     
-    return anos,meses,dias
+    return anos,meses,dias  # retorna uma tupla
     
 
     
@@ -90,8 +85,6 @@ print('-='*20)
 nome = input('Nome do servidor: ').upper()
 sexo = input('Gênero [M/F]: ').strip().lower()
 nasc = input('Data de nascimento [DD/MM/AAAA]: ').strip().split('/')
-
-hoje = date.today()
 
 # Aposentadoria por idade
 
@@ -113,28 +106,31 @@ else:
 # Aposentadoria voluntária integral
 # 60 idade e 35 contrib H / 55 idade e 30 contrib M
 
-exercicio = input('Servidor em exercício? [S/N]: ').strip().lower()
 
-# servidor em exercício sem tempo a incorporar
-# data final == hoje
-
-# -------------------------------------------------------------
-# ADEQUAR O CODIGO ABAIXO À NOVA LÓGICA DE CONTAGEM DE TEMPO
-# -------------------------------------------------------------
-
-if exercicio == 's':
-    adm = input('\nData de admissão na SEMED [DD/MM/AAAA]: ').strip().split('/')
-    print('\n\nCalculando tempo de serviço...')
-    sleep(5)
-    tempo = calculaTempo(adm,hoje) 
-elif exercicio == 'n':
-    inicio = input('\nDigite a data inicial do vínculo [DD/MM/AAAA]: ').strip().split('/')
-    fim = input('Digite a data final do vínculo [DD/MM/AAAA]: ').strip().split('/')
-    print('\n\nCalculando tempo de serviço...\n')
-    sleep(5)
-    tempo = calculaTempo(inicio,fim)
     
-print('Servidor possui {} anos, {} meses e {} dias de tempo de contribuição'.format(tempo[0],tempo[1],tempo[2]))
+inicio = input('\nDigite a data inicial do vínculo [DD/MM/AAAA]: ').strip().split('/')
+fim = input('Digite a data final do vínculo. \nSe o servidor estiver em exercício, digite a data de hoje [DD/MM/AAAA]: ').strip().split('/')
+
+print('\n\nCalculando tempo de serviço...\n')
+sleep(5)
+dias_trab = calculaTempo(inicio,fim)
+
+# ADICIONAR TEMPO DE INCORPORAÇÃO
+
+inc = input('Servidor possui período de tempo a ser incorporado [S/N] ?  ').strip().lower()
+
+if inc == 's':
+    
+    while True:
+        pass
+
+tempo = tempoServico(dias_trab)     # ARGUMENTO DEVE SER DIAS_TRAB + DIAS INCORP
+    
+
+    
+    
+
+print('Servidor possui {} dias de tempo de contribuição, convertidos para {} anos, {} meses e {} dias.'.format(dias_trab,tempo[0],tempo[1],tempo[2]))
 
 if tempo[0] >= 35 and sexo == 'm' and anos_idade >= 60:
     print('Servidor apto para Aposentadoria Voluntária Integral.')
