@@ -17,7 +17,8 @@ from time import sleep
 # compulsoria: 75 idade
 # voluntária integral: 60 idade e 35 contrib H / 55 idade e 30 contrib M
 # voluntária proporcional ao tempo de contrib: 65 idade H / 60 idade M
-    
+
+hoje = date.today()
     
 
 def bissexto(ano):
@@ -28,7 +29,7 @@ def bissexto(ano):
 
 def calculaIdade(data):
     '''Função que recebe uma data de nascimento e informa a idade.'''
-    hoje = date.today()
+    
 
     data = date(int(data[2]),int(data[1]),int(data[0]))
 
@@ -118,7 +119,7 @@ else:
 # Aposentadoria voluntária integral
 # 60 idade e 35 contrib H / 55 idade e 30 contrib M
 
-print('TEMPO DE CONTRIBUIÇÃO\n')
+print('\nTEMPO DE CONTRIBUIÇÃO\n')
     
 inicio = input('\nDigite a data inicial do vínculo [DD/MM/AAAA]: ').strip().split('/')
 fim = input('Digite a data final do vínculo [DD/MM/AAAA]. \nSe o servidor estiver em exercício, digite a data de hoje: ').strip().split('/')
@@ -128,7 +129,6 @@ dias_trab = calculaTempo(inicio,fim)
 
 dias_incorp = 0
 
-# ADICIONAR TEMPO DE INCORPORAÇÃO
 
 inc = input('\nServidor possui período de tempo a ser incorporado [S/N] ?  ').strip().lower()
 
@@ -163,4 +163,16 @@ elif tempo[0] >= 30 and sexo == 'f' and anos_idade >= 55:
 else:
     print('Servidor(a) não preenche os requisitos para Aposentadoria Voluntária Integral.')
     
-
+    if sexo == 'f':
+        
+        tempo_faltante = 10950 - total
+        faltante_formatado = tempoServico(tempo_faltante)
+        
+        print('\nServidora poderá requerer aposentadoria voluntária integral em {} dias, correspondentes a {} anos, {} meses e {} dias.'.format(tempo_faltante,faltante_formatado[0],faltante_formatado[1],faltante_formatado[2]))
+    
+    elif sexo == 'm':
+        
+        tempo_faltante = 12775 - total
+        faltante_formatado = tempoServico(tempo_faltante)
+        
+        print('\nServidor poderá requerer Aposentadoria Voluntária Integral em {} dias, correspondentes a {} anos, {} meses e {} dias.'.format(tempo_faltante,faltante_formatado[0],faltante_formatado[1],faltante_formatado[2]))
