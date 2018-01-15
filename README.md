@@ -14,3 +14,6 @@ scripts utilitários para automação de atividades corriqueiras simples
 
 
 > duplicadosTXT.py: script que lê um arquivo de texto contendo nomes de servidores, localiza as duplicidades e as armazena em um novo arquivo .txt.
+
+
+> qtdDuplicadosCSV.py: script que compara o campo Nome de dois arquivos CSV e retorna a quantidade de duplicados.
