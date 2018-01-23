@@ -9,7 +9,7 @@
 # se não for possível aposentar, informar o tempo (idade ou svc) restante
 # exibir um relatório com as informações em arquivo externo
 
-from datetime import date
+from datetime import date, datetime
 from time import sleep
 
 #RGPS
@@ -19,7 +19,32 @@ from time import sleep
 # voluntária proporcional ao tempo de contrib: 65 idade H / 60 idade M
 
 hoje = date.today()
+
+def check_date(year, month, day):
+    '''Função que checa se uma data inserida é válida.'''
+    correctDate = None
     
+    try:
+        newDate = datetime(year, month, day)
+        correctDate = True
+    except ValueError:
+        correctDate = False
+    
+    return correctDate
+
+def is_future(data):
+    '''Função que checa se uma data é futura.'''
+    
+    valid = None
+    data = date(int(data[2]),int(data[1]),int(data[0]))
+    
+    if data > date.today():
+        print('Data futura, tente novamente.')
+        valid = False
+    else:
+        valid = True
+    
+    return valid
 
 def bissexto(ano):
     '''Verifica se o ano passado como argumento é bissexto.'''
@@ -90,8 +115,26 @@ print('-='*20)
 
 nome = input('Nome do servidor: ').upper()
 cargo = input('Cargo: ').upper()
-sexo = input('Gênero [M/F]: ').strip().lower()
-nasc = input('Data de nascimento [DD/MM/AAAA]: ').strip().split('/')
+
+while True:
+    
+    sexo = input('Gênero [M/F]: ').strip().lower()
+    if sexo != 'm' and sexo != 'f':
+        print('Campo "Gênero" inválido. Digite "M" para Masculino ou "F" para feminino.\n')
+    else:
+        break
+
+while True:
+    
+    try:
+        nasc = input('Data de nascimento [DD/MM/AAAA]: ').strip().split('/')
+
+        valid = check_date(int(nasc[2]),int(nasc[1]),int(nasc[0]))
+        future = is_future(nasc)
+        break
+    
+    except (ValueError, IndexError) as e:
+        print('Insira uma data válida.')
 
 
 # Aposentadoria por idade
