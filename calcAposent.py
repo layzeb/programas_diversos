@@ -14,11 +14,12 @@ from time import sleep
 
 #RGPS
 
-# compulsoria: 75 idade
+# compulsória: 75 idade
 # voluntária integral: 60 idade e 35 contrib H / 55 idade e 30 contrib M
 # voluntária proporcional ao tempo de contrib: 65 idade H / 60 idade M
 
 hoje = date.today()
+
 
 def check_date(year, month, day):
     '''Função que checa se uma data inserida é válida.'''
@@ -32,19 +33,19 @@ def check_date(year, month, day):
     
     return correctDate
 
-def is_future(data):
-    '''Função que checa se uma data é futura.'''
+def is_future(year, month, day):
     
     valid = None
-    data = date(int(data[2]),int(data[1]),int(data[0]))
     
-    if data > date.today():
+    data = datetime(year, month, day)
+    if data > datetime.now():
         print('Data futura, tente novamente.')
         valid = False
     else:
         valid = True
     
     return valid
+
 
 def bissexto(ano):
     '''Verifica se o ano passado como argumento é bissexto.'''
@@ -120,7 +121,7 @@ while True:
     
     sexo = input('Gênero [M/F]: ').strip().lower()
     if sexo != 'm' and sexo != 'f':
-        print('Campo "Gênero" inválido. Digite "M" para Masculino ou "F" para feminino.\n')
+        print('Campo "Gênero" inválido. Digite "M" para Masculino ou "F" para Feminino.\n')
     else:
         break
 
@@ -130,13 +131,16 @@ while True:
         nasc = input('Data de nascimento [DD/MM/AAAA]: ').strip().split('/')
 
         valid = check_date(int(nasc[2]),int(nasc[1]),int(nasc[0]))
-        future = is_future(nasc)
-        break
+        future = is_future(int(nasc[2]),int(nasc[1]),int(nasc[0]))
+        
+        if valid and future:
+            break
     
     except (ValueError, IndexError) as e:
         print('Insira uma data válida.')
 
-
+        
+        
 # Aposentadoria por idade
 
 print('\n\nCalculando idade...')
@@ -163,32 +167,96 @@ else:
 # 60 idade e 35 contrib H / 55 idade e 30 contrib M
 
 print('\nTEMPO DE CONTRIBUIÇÃO\n')
+
+while True:
     
-inicio = input('\nDigite a data inicial do vínculo [DD/MM/AAAA]: ').strip().split('/')
-fim = input('Digite a data final do vínculo [DD/MM/AAAA]. \nSe o servidor estiver em exercício, digite a data de hoje: ').strip().split('/')
+    try:
+        
+        inicio = input('\nDigite a data inicial do vínculo atual no formato [DD/MM/AAAA]. \nSe o servidor não estiver trabalhando, digite a data de admissão do último vínculo: ').strip().split('/')
+        
+        valid_ini = check_date(int(inicio[2]),int(inicio[1]),int(inicio[0]))
+        fut_ini = is_future(int(inicio[2]),int(inicio[1]),int(inicio[0]))
+        
+        if valid_ini and fut_ini:
+            break
+        
+    except (ValueError, IndexError) as e:
+        print('Insira uma data válida.')
+    
+while True:
+    
+    try:
+        
+        fim = input('Digite a data final do vínculo no formato [DD/MM/AAAA]. \nSe o servidor estiver em exercício, digite a data de hoje: ').strip().split('/')
+        
+        valid_fim = check_date(int(fim[2]),int(fim[1]),int(fim[0]))
+        fut_fim = is_future(int(fim[2]),int(fim[1]),int(fim[0]))
+        
+        if valid_fim and fut_fim:
+            break
+        
+    except (ValueError, IndexError) as e:
+        print('Insira uma data válida.')
 
 
 dias_trab = calculaTempo(inicio,fim)
 
 dias_incorp = 0
 
-
-inc = input('\nServidor possui período de tempo a ser incorporado [S/N] ?  ').strip().lower()
-
-if inc == 's':
+while True:
     
-    while True:
-        
-        ini_incorp = input('\nDigite a data inicial do vínculo [DD/MM/AAAA]: ').strip().split('/')
-        fim_incorp = input('Digite a data final do vínculo [DD/MM/AAAA]: ').strip().split('/')
-        dias_incorp += calculaTempo(ini_incorp,fim_incorp)
-        
-        outra_inc = input('\nAdicionar mais um período de incorporação [S/N] ? ').strip().lower()
-        if outra_inc == 'n':
-            break
-        elif outra_inc == 's':
-            continue
+    inc = input('\nServidor possui período de tempo a ser incorporado [S/N] ?  ').strip().lower()
 
+    if inc != 's' and inc != 'n':
+        print('Campo inválido. Digite "S" para adicionar período de tempo a ser incorporado ou "N" se não houver incorporações.\n')
+        continue
+        
+    elif inc == 's':
+        
+        while True:
+            
+            while True:
+                
+                try:
+                
+                    ini_incorp = input('\nDigite a data inicial do vínculo [DD/MM/AAAA]: ').strip().split('/')
+
+                    valid_inc = check_date(int(ini_incorp[2]),int(ini_incorp[1]),int(ini_incorp[0]))
+                    fut_fim = is_future(int(ini_incorp[2]),int(ini_incorp[1]),int(ini_incorp[0]))
+
+                    if valid_fim and fut_fim:
+                        break
+                
+                except (ValueError, IndexError) as e:
+                    print('Insira uma data válida.')
+
+            while True:
+                
+                try:
+                    
+                    fim_incorp = input('Digite a data final do vínculo [DD/MM/AAAA]: ').strip().split('/')
+                    
+                    valid_fim_inc = check_date(int(fim_incorp[2]),int(fim_incorp[1]),int(fim_incorp[0]))
+                    fut_fim_inc = is_future(int(fim_incorp[2]),int(fim_incorp[1]),int(fim_incorp[0]))
+
+                    if valid_fim_inc and fut_fim_inc:
+                        break
+                
+                except (ValueError, IndexError) as e:
+                    print('Insira uma data válida.')
+                    
+            dias_incorp += calculaTempo(ini_incorp,fim_incorp)
+            
+            outra_inc = input('\nPara adicionar mais um período de incorporação, digite "S". \nPara prosseguir, pressione qualquer tecla: ').strip().lower()
+            
+            if outra_inc == 's':
+                continue
+            else:
+                break
+    
+    break
+    
+    
 total = somaDias(dias_trab,dias_incorp)        
         
 tempo = tempoServico(total)     
