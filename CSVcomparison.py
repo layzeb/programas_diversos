@@ -4,31 +4,24 @@
 # 20 FEB 2018
 # Python 3.6.2
 
-# importação do módulo csv
+# importa o módulo csv
 import csv
 
-comuns = [] # lista que irá armazenar todos os dados
+# abre os arquivos de leitura e escrita para análise e manipulação
+with open('arqOriginal.csv', 'r') as original, open('arqComparativo.csv', 'r') as comparativo, open('arqEditado.csv', 'w') as editado:  
 
-# abrindo os arquivos para leitura
-with open('folhaSemed.csv', 'r') as original, open('comparativo.csv', 'r') as readaptados:  
-
-    # tornando os arq iteráveis para leitura
+    # cria objetos iteráveis para leitura (reader) e escrita (writer)
     lerOriginal = csv.reader(original)
-    lerReadap = csv.reader(readaptados)
-
-    # comparando as entradas de cada arquivo
-
-    for linhaReadap in lerReadap:
-        for linhaOrig in lerOriginal:
-            if linhaReadap[1] == linhaOrig[1]:
-                comuns.append(linhaReadap)
-                break
+    lerComp = csv.reader(comparativo)
+    escEdit = csv.writer(editado)
+    
+    # iteração pelos dois arquivos de leitura, procurando um campo especificado em comun entre ambos
+    
+    for linhaComp in lerComp:   # analisando cada linha do arquivo comparado
+        for linhaOrig in lerOriginal:   # com cada linha do arquivo original
+            if linhaComp[0] == linhaOrig[0]:    # se o campo do índice[0] - no caso em tela, campo NOME - forem iguais em ambos:
+                linhaOrig[4] = 'SUPORTE PEDAGOGICO' # o valor do campo no índice [4] é alterado pela string desejada
+                escEdit.writerow(linhaOrig)         # e após a modificação, a linha inteira é escrita no arquivo novo (editado)
+                break       # após o encontro da ocorrência, finaliza a iteração e passa para o item seguinte
             else:
-                comuns.append(linhaOrig)
-
-
-# abre o arquivo para edição
-with open('especialistas.csv', 'w') as suporte:
-    escSuporte = csv.writer(suporte)
-    for linha in comuns:
-        escSuporte.writerow(linha)
+                escEdit.writerow(linhaOrig)     # se não houver campos iguais, apenas escrever a linha do arquivo original
